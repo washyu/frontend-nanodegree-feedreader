@@ -27,46 +27,107 @@ $(function() {
         });
 
 
-        /* TODO: Write a test that loops through each feed
-         * in the allFeeds object and ensures it has a URL defined
+        /* Test function ensures it has a URL defined
          * and that the URL is not empty.
          */
+        function checkUrl(url) {
+            it('Url is defined: ' + url, function() {
+                expect(url).toBeDefined();
+                expect(url.length).not.toBe(0);
+            });
+            it('Url is a string', function() {
+                expect(url).toEqual(jasmine.any(String));
+            });
+        }
 
 
-        /* TODO: Write a test that loops through each feed
-         * in the allFeeds object and ensures it has a name defined
+        /* Test function ensures it has a name defined
          * and that the name is not empty.
          */
-    });
+
+        function checkName(name) {
+            it('Name is defined: ' + name, function() {
+                expect(name).toBeDefined();
+                expect(name.length).not.toBe(0);
+            });
+            it('Name is a string', function() {
+                expect(name).toEqual(jasmine.any(String));
+            });
+        }
+
+        //loop through all elements of allFeeds and validate the url and name.
+        for(var i = 0; i < allFeeds.length; i++){
+            checkUrl(allFeeds[i].url);
+            checkName(allFeeds[i].name);
+        }
+    }); // close checkUrl
 
 
-    /* TODO: Write a new test suite named "The menu" */
-
-        /* TODO: Write a test that ensures the menu element is
-         * hidden by default. You'll have to analyze the HTML and
-         * the CSS to determine how we're performing the
-         * hiding/showing of the menu element.
+    describe('The Menu', function() {
+        /* Added the jasmine-jquery script to add some extra funcnality and improve readability.
+         * Mainly the haveClass method.  Could have done this look up with just jquery selectors.
+         * The css attribute menu-hidden on the body tag is what hids the menu,
          */
+        it('is hidden by default', function() {
+            expect($('body')).toHaveClass('menu-hidden');
+        });
 
-         /* TODO: Write a test that ensures the menu changes
-          * visibility when the menu icon is clicked. This test
-          * should have two expectations: does the menu display when
-          * clicked and does it hide when clicked again.
+         /*  The link just toggles the menu-hidden class attribte on the body node.
+          *  the menu button is just toggling the menu-hidden class on the body tag
           */
+        it('menu is visibility is toggled on click', function() {
+            $('.menu-icon-link').trigger('click');
+            expect($('body')).not.toHaveClass('menu-hidden');
+            $('.menu-icon-link').trigger('click');
+            expect($('body')).toHaveClass('menu-hidden');
+        });
+    }); // close the The Menu
 
-    /* TODO: Write a new test suite named "Initial Entries" */
 
-        /* TODO: Write a test that ensures when the loadFeed
-         * function is called and completes its work, there is at least
-         * a single .entry element within the .feed container.
-         * Remember, loadFeed() is asynchronous so this test wil require
-         * the use of Jasmine's beforeEach and asynchronous done() function.
+    describe('Initial Entries', function() {
+        /* Since the loadFeed() is asynchronous we will call it and pass the jasmine
+         * done function to the call back parameter of loadFeed().  This will "halt" the test till loadFeed
+         * is complete.
          */
+        beforeEach(function(done) {
+            loadFeed(0, done);
+        });
 
-    /* TODO: Write a new test suite named "New Feed Selection"
+        // after loadfeed returns i will check to see if there are any .entry-link elements.
+        it('there is at least one ', function() {
+            var entryLinks = $('.feed').children('.entry-link');
+            expect(entryLinks).toBeDefined();
+            expect(entryLinks.length).toBeGreaterThan(0);
+        });
+    });// close Initial Entries
 
-        /* TODO: Write a test that ensures when a new feed is loaded
-         * by the loadFeed function that the content actually changes.
-         * Remember, loadFeed() is asynchronous.
-         */
-}());
+
+    describe('New Feed Selection', function() {
+        // variable to hold the .feed elements for comparison later.
+        var prevFeed, currentFeed;
+        var feed = 0;
+
+        beforeEach(function(done) {
+            expect(allFeeds.length).toBeGreaterThan(1);
+            loadFeed(feed, done);
+        });
+
+        it('get content', function() {
+            // grabbing the html string for the element
+            prevFeed =  $('.feed').prop('outerHTML');
+            expect(prevFeed).toBeDefined();
+            //incrementing the intger for the feed array to load a different feed.
+            feed++;
+        });
+
+        it('content has changed', function() {
+            // grabbing the html string for the element
+            currentFeed = $('.feed').prop('outerHTML');
+            expect(currentFeed).toBeDefined();
+            /* using the html string to compare becasue I was having issues with the objects and didn't really want
+             * to write a custome matcher.
+             */
+            expect(prevFeed).not.toEqual(currentFeed);
+        });
+    }); //close New Feed Selection
+}); // Close toplevel
