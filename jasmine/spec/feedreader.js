@@ -56,10 +56,10 @@ $(function() {
         }
 
         //loop through all elements of allFeeds and validate the url and name.
-        for(var i = 0; i < allFeeds.length; i++){
-            checkUrl(allFeeds[i].url);
-            checkName(allFeeds[i].name);
-        }
+        allFeeds.forEach(function(feed){
+          checkUrl(feed.url);
+          checkName(feed.name);
+        });
     }); // close checkUrl
 
 
